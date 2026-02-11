@@ -1,0 +1,41 @@
+import requests
+
+# Configuration
+ACCESS_TOKEN = "zIjeakEiESqCrb7WgEPLFjeC76zKuJVV"
+BASE_URL = "https://api.box.com/2.0"
+
+def add_hub_co_owner(hub_id, user_id):
+    """Ajoute un co-propriétaire à un Hub."""
+    url = f"{BASE_URL}/hub_collaborations"
+    headers = {
+        "Authorization": f"Bearer {ACCESS_TOKEN}",
+        "Content-Type": "application/json",
+        "box-version": "2025.0"
+    }
+    payload = {
+        "hub": {
+            "id": hub_id,
+            "type": "hubs"
+        },
+        "accessible_by": {
+            "type": "user",
+            "id": user_id
+        },
+        "role": "co-owner"
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+# Exemple d'utilisation
+hub_ids = ["ID_DU_HUB_1", "ID_DU_HUB_2", "ID_DU_HUB_3"]  # Remplacez par les IDs des Hubs
+user_ids = ["ID_UTILISATEUR_1", "ID_UTILISATEUR_2", "ID_UTILISATEUR_3", "ID_UTILISATEUR_4", "ID_UTILISATEUR_5"]  # Remplacez par les IDs des utilisateurs
+
+for hub_id in hub_ids:
+    for user_id in user_ids:
+        try:
+            result = add_hub_co_owner(hub_id, user_id)
+            print(f"Co-propriétaire avec ID {user_id} ajouté au Hub {hub_id} avec succès. ID de collaboration : {result['id']}")
+        except requests.exceptions.HTTPError as err:
+            print(f"Erreur lors de l'ajout du co-propriétaire avec ID {user_id} au Hub {hub_id}. Statut HTTP : {err.response.status_code}")
+            print(f"Réponse de l'API : {err.response.text}")
